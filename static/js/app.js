@@ -16,6 +16,7 @@ const skeletonLoader = document.getElementById('skeleton-loader');
 const emptyState = document.getElementById('empty-state');
 const resultsHeading = document.getElementById('results-heading');
 const resultsCountText = document.getElementById('results-count-text');
+const btnExportCsv = document.getElementById('btn-export-csv');
 
 // Dashboard Stats
 const statsTotal = document.getElementById('stats-total');
@@ -57,6 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Bind Event Listeners
     btnRefresh.addEventListener('click', fetchNotes);
+    if (btnExportCsv) {
+        btnExportCsv.addEventListener('click', exportToCsv);
+    }
     
     // Search inputs
     searchInput.addEventListener('input', handleSearchInput);
@@ -290,6 +294,10 @@ function renderNotes() {
                 </a>
                 
                 <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn-copy-card" onclick="event.stopPropagation(); handleCopyCardClick('${note.id}')" title="Copy to Clipboard">
+                        <i data-lucide="copy"></i>
+                        <span>Copy</span>
+                    </button>
                     <button class="btn-tweet-card" onclick="event.stopPropagation(); handleTweetClick('${note.id}')">
                         <i data-lucide="twitter"></i>
                         <span>Tweet</span>
@@ -472,4 +480,70 @@ function publishTweet() {
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(twitterUrl, '_blank', 'noopener,noreferrer');
     closeComposer();
+}
+
+function handleCopyCardClick(noteId) {
+    const note = allNotes.find(n => n.id === noteId);
+    if (!note) return;
+    
+    const copyText = `📢 BigQuery ${note.type} (${note.date}):\n${note.text}\n\n🔗 Read more: ${note.link}`;
+    navigator.clipboard.writeText(copyText).then(() => {
+        const cardEl = document.getElementById(noteId);
+        if (cardEl) {
+            const btn = cardEl.querySelector('.btn-copy-card');
+            const btnSpan = btn.querySelector('span');
+            const originalText = btnSpan.textContent;
+            
+            btnSpan.textContent = 'Copied!';
+            btn.style.borderColor = 'var(--color-feature)';
+            btn.style.color = 'var(--color-feature)';
+            
+            setTimeout(() => {
+                btnSpan.textContent = originalText;
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error('Failed to copy card text: ', err);
+    });
+}
+
+function exportToCsv() {
+    if (filteredNotes.length === 0) {
+        alert("No release notes to export.");
+        return;
+    }
+    
+    let csvRows = [];
+    csvRows.push(['ID', 'Date', 'Type', 'Description', 'Link'].map(h => `"${h.replace(/"/g, '""')}"`).join(','));
+    
+    filteredNotes.forEach(note => {
+        const row = [
+            note.id,
+            note.date,
+            note.type,
+            note.text,
+            note.link
+        ];
+        csvRows.push(row.map(val => {
+            const escaped = ('' + val).replace(/"/g, '""');
+            return `"${escaped}"`;
+        }).join(','));
+    });
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const filterName = activeFilter.replace(/\s+/g, '_').toLowerCase();
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `bigquery_release_notes_${filterName}_${dateStr}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
