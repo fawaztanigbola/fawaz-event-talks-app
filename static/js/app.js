@@ -17,6 +17,9 @@ const emptyState = document.getElementById('empty-state');
 const resultsHeading = document.getElementById('results-heading');
 const resultsCountText = document.getElementById('results-count-text');
 const btnExportCsv = document.getElementById('btn-export-csv');
+const btnThemeToggle = document.getElementById('btn-theme-toggle');
+const iconThemeSun = document.getElementById('icon-theme-sun');
+const iconThemeMoon = document.getElementById('icon-theme-moon');
 
 // Dashboard Stats
 const statsTotal = document.getElementById('stats-total');
@@ -53,6 +56,34 @@ if (progressIndicator) {
 
 // --- INIT APP ---
 document.addEventListener('DOMContentLoaded', () => {
+    // Theme toggle initialization
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'light') {
+        document.body.classList.add('light-theme');
+        if (iconThemeSun && iconThemeMoon) {
+            iconThemeSun.style.display = 'none';
+            iconThemeMoon.style.display = 'block';
+        }
+    }
+
+    if (btnThemeToggle) {
+        btnThemeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            
+            if (iconThemeSun && iconThemeMoon) {
+                if (isLight) {
+                    iconThemeSun.style.display = 'none';
+                    iconThemeMoon.style.display = 'block';
+                } else {
+                    iconThemeSun.style.display = 'block';
+                    iconThemeMoon.style.display = 'none';
+                }
+            }
+        });
+    }
+
     // Initial fetch
     fetchNotes();
     

@@ -40,7 +40,11 @@
                     </div>
                 </div>
                 
-                <div class="action-section">
+                <div class="action-section" style="display: flex; gap: 12px; align-items: center;">
+                    <button id="btn-theme-toggle" class="btn-secondary btn-theme" aria-label="Toggle theme" style="padding: 10px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                        <i data-lucide="sun" id="icon-theme-sun"></i>
+                        <i data-lucide="moon" id="icon-theme-moon" style="display: none;"></i>
+                    </button>
                     <button id="btn-refresh" class="btn-primary" aria-label="Refresh release notes">
                         <i data-lucide="refresh-cw" id="icon-refresh" class="icon-spin-target"></i>
                         <span>Refresh Notes</span>
