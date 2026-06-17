@@ -869,6 +869,33 @@ body {
     gap: 6px;
 }
 
+/* Theme Toggle Button & Icon Visibility */
+.btn-theme {
+    width: 42px;
+    height: 42px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#icon-theme-sun {
+    display: block !important;
+}
+
+#icon-theme-moon {
+    display: none !important;
+}
+
+body.light-theme #icon-theme-sun {
+    display: none !important;
+}
+
+body.light-theme #icon-theme-moon {
+    display: block !important;
+}
+
 /* Card Selection Check Indicator */
 .card-selector {
     width: 18px;
